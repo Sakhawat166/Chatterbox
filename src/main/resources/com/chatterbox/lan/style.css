@@ -1,0 +1,75 @@
+/* 1. Reset the main List View background */
+.list-view {
+    -fx-background-color: transparent;
+    -fx-padding: 10; /* Adds space around the whole list */
+}
+
+/* 2. Fix the Cells (The rows) */
+.list-cell {
+    -fx-background-color: transparent; /* Removes default colors */
+    -fx-border-width: 0;               /* REMOVES WEIRD BORDERS */
+    -fx-padding: 5px;                  /* Space inside each row */
+    -fx-text-fill: black;              /* Default text color */
+}
+
+/* 3. Fix the "Banishing" (Selection State) */
+/* When you click/select a cell, keep text black and use a light grey background */
+.list-cell:filled:selected:focused,
+.list-cell:filled:selected {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: black;
+    -fx-background-insets: 0; /* Removes the inner focus ring border */
+}
+
+/* 4. Fix that large red/brown block at the bottom (Empty Cells) */
+.list-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+/* reset DONE */
+
+
+
+
+.message-box {
+    -fx-padding: 10;
+    -fx-background-radius: 10;
+    -fx-max-width: 300;
+}
+
+.message-list {
+    -fx-background-color: #f1f0f8;
+
+}
+.user-list {
+    -fx-background-color: #e0e0e0;
+}
+.side-bar{
+    -fx-background-color: #f0f0f0;
+}
+
+
+.message-me {
+    -fx-background-color: #dcf8c6; /* Light Green */
+}
+
+message-other {
+    -fx-background-color: #e0e0e0; /* Grey */
+}
+
+.username-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 10px;
+    -fx-text-fill: #555555;
+}
+
+.message-text {
+    -fx-fill: black;
+    -fx-font-size: 14px;
+}
+
+
+
+
+

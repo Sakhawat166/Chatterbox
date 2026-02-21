@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatterbox.lan.controllers.ChatPageController">
+   <left>
+      <HBox prefHeight="400.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <VBox styleClass="side-bar">
+            <children>
+               <Button mnemonicParsing="false" text="Button" />
+            </children></VBox>
+         <ListView fx:id="userList" prefHeight="400.0" prefWidth="150.0" styleClass="user-list" />
+      </HBox>
+   </left>
+   <center>
+      <VBox>
+         <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #b5c9e8;">
+            <children>
+               <Label fx:id="inboxLabel" />
+            </children>
+         </HBox>
+      <ListView fx:id="messageList" styleClass="message-list"  BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS" />
+      </VBox>
+   </center>
+</BorderPane>
