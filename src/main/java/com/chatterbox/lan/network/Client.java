@@ -6,7 +6,7 @@ import java.net.Socket;
 
 public class Client {
     public Client() {
-        String PORT = env.getPORT();
+        int PORT = env.getPORT();
         try (
                 Socket clientSocket = new Socket("localhost", PORT);
                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
