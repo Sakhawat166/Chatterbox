@@ -6,6 +6,8 @@ module com.chatterbox.lan {
     requires org.mongodb.driver.sync.client;
     requires org.mongodb.driver.core;
     requires org.mongodb.bson;
+    requires jdk.httpserver;
+    requires jdk.incubator.vector;
 
 
     opens com.chatterbox.lan to javafx.fxml;

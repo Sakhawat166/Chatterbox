@@ -1,9 +1,12 @@
 package com.chatterbox.lan.models;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Message {
-    private User user;
+public class Message implements Serializable {
+    private  static final long serialVersionUID = 1L;
+    private User sender;
+    private User receiver;
     private String text;
     private String id;
     private LocalDateTime timestamp;
@@ -11,14 +14,22 @@ public class Message {
 
 
     public Message(User user, String text,String conversationId ) {
-        this.user = user;
+        this.sender = user;
         this.text = text;
         this.conversationId = conversationId;
         this.timestamp = LocalDateTime.now();
     }
-    public Message(String id, User user, String text,String conversationId ,LocalDateTime timestamp) {
+    public Message(User sender, User receiver, String text,String conversationId ,LocalDateTime timestamp) {
+        this.receiver = receiver;
+        this.sender = sender;
+        this.text = text;
+        this.timestamp = timestamp;
+        this.conversationId = conversationId;
+    }
+    public Message(String id, User sender, User reciever, String text,String conversationId ,LocalDateTime timestamp) {
         this.id = id;
-        this.user = user;
+        this.receiver = reciever;
+        this.sender = sender;
         this.text = text;
         this.timestamp = timestamp;
         this.conversationId = conversationId;
@@ -39,12 +50,22 @@ public class Message {
     public void setId(String id) {
         this.id = id;
     }
-    public User getUser() {
-        return user;
+
+
+    public User getReceiver() {
+        return receiver;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
     public String getText() {

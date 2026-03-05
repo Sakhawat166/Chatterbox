@@ -1,9 +1,9 @@
 package com.chatterbox.lan.controllers;
 
 
-import com.chatterbox.lan.database.*;
 import com.chatterbox.lan.models.*;
-import javafx.collections.ObservableList;
+import com.chatterbox.lan.network.*;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,19 +12,18 @@ import javafx.scene.control.TextField;
 
 import java.util.List;
 
+
 public class ChatPageController {
-    private MessageRepo messageRepo;
-    private UserRepo userRepo;
+    private Client client;
     private User currentUser;
     private String currentConversationId;
-    private String selectedUsername;
+
 
     @FXML
     private ListView<Message> messageList;
 
-
     @FXML
-    private ListView<String> userList;
+    private ListView<Conversation> conversationList;
 
     @FXML
     private Label inboxLabel;
@@ -37,135 +36,135 @@ public class ChatPageController {
 
     @FXML
     public void initialize() {
-//        userList.getItems().addAll("jon","doe");
-//
-//        // Create users
-//
-//        // Create users
-//        User me = new User("jon", "/avatars/avatar1.png");
-//        me.setMe(true); // Mark this user as "me"
-//
-//        User other = new User("doe", "/avatars/avatar2.png");
-//        other.setMe(false); // This is another user
-//        inboxLabel.setText(other.getUsername());
-//
-//        // Add messages
-//        messageList.getItems().addAll(
-//                new Message(me, "Hello world!"),
-//                new Message(me, "This is my message"),
-//                new Message(other, "Hello from the other side!"),
-//                new Message(other, "This message is from someone else")
-//        );
-
-        db.connect();
-        messageRepo = new MessageRepo();
-        userRepo = new UserRepo();
-
-        // Set up current user (the logged-in user)
-        currentUser = new User("jon", "/avatars/avatar1.png");
-        currentUser.setMe(true);
-        userRepo.saveUser(currentUser);
-
-        // Create some other users for demo (you can remove this later)
-        User user2 = new User("doe", "/avatars/avatar2.png");
-        userRepo.saveUser(user2);
-
-        User user3 = new User("alice", "/avatars/avatar3.png");
-        userRepo.saveUser(user3);
-
-        // Load all users into the user list
-        loadUsers();
-
-        // Set up message cell factory
         messageList.setCellFactory(param -> new MessageCell());
 
-        // Listen for user selection changes
-        userList.getSelectionModel().selectedItemProperty().addListener((obs, oldUser, newUser) -> {
-            if (newUser != null) {
-                loadConversation(newUser);
+    }
+
+    // Called by LoginController after successful login
+    public void setCurrentUser(User user, Client clientInstance) {
+        this.currentUser = user;
+        this.client = clientInstance;
+
+        client.setMessageListener(event -> Platform.runLater(() -> {
+            switch (event.getType()) {
+                case "NEW_MESSAGE" -> handleIncomingMessage(event);
+                case "MESSAGES_RESPONSE" -> handleMessagesResponse(event);
+                case "USERS_UPDATED" -> handleConversationsUpdate(event);
+                default -> System.err.println("[CLIENT] Unknown event type: " + event.getType());
             }
-        });
+        }));
+
+        conversationList.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        onConversationSelected(newVal);
+
+                    }
+                });
+
+        // Fetch conversations immediately after login
+        client.getUsers();
 
 
-        if (!userList.getItems().isEmpty()) {
-            userList.getSelectionModel().select(0);
+    }
+
+    private void appendMessages(List<Message> messages) {
+        messageList.getItems().addAll(messages);
+        if (!messages.isEmpty()) {
+            messageList.scrollTo(messages.size() - 1);
         }
     }
 
+    private void onConversationSelected(Conversation conversation) {
+        if (conversation == null) {
+            return;
+        }
+        currentConversationId = conversation.getConversationId();
+        inboxLabel.setText(conversation.getName());
+        client.getMessages(currentConversationId);
+    }
 
-    private void loadUsers() {
-        List<User> users = userRepo.getAllUsers();
-        userList.getItems().clear();
 
-        for (User user : users) {
-            // Don't show yourself in the user list
-            if (!user.getUsername().equals(currentUser.getUsername())) {
-                userList.getItems().add(user.getUsername());
+
+    // for loading conversations in the left pane when user logs in or when new conversation is created
+    private void handleConversationsUpdate(Event event) {
+        @SuppressWarnings("unchecked")
+        List<Conversation> conversations = (List<Conversation>) event.getData("conversations");
+
+        if (conversations == null) {
+            System.err.println("No conversations in response");
+            return;
+        }
+
+        conversationList.getItems().clear();
+        conversationList.getItems().addAll(conversations);
+        System.out.println("[CONTROLLER] Updated conversations: " + conversations.size() + " conversations");
+    }
+
+
+    // for loading new incoming message in real-time
+    private void handleIncomingMessage(Event event) {
+        if (currentConversationId == null || !currentConversationId.equals(event.getConversationId())) return;
+
+        User sender = new User(event.getUsername(), "/avatars/default.png");
+        sender.setMe(sender.getUsername().equals(currentUser.getUsername()));
+
+        Message incoming = new Message(sender, event.getText(), event.getConversationId());
+        appendMessages(List.of(incoming));
+    }
+
+    // for loading all message of a conversation when selected
+    private void handleMessagesResponse(Event event) {
+
+        List<Message> messages = (List<Message>) event.getData("messages");
+        if (messages == null) {
+            System.err.println("No messages in response");
+            return;
+        }
+
+        // Set isMe flag for each message's sender
+        for (Message message : messages) {
+            if (message.getSender() != null) {
+                boolean isCurrentUser = message.getSender().getUsername().equals(currentUser.getUsername());
+                message.getSender().setMe(isCurrentUser);
             }
         }
+
+
+        messageList.getItems().clear();
+        appendMessages(messages);
     }
 
 
-    private void loadConversation(String otherUsername) {
-        selectedUsername = otherUsername;
-        currentConversationId = buildConversationId(currentUser.getUsername(), otherUsername);
-
-        // Get messages for this conversation
-        List<Message> messages = messageRepo.getMessages(currentConversationId);
-
-        // Mark messages as "me" or "other"
-        for (Message msg : messages) {
-            boolean isMe = msg.getUser().getUsername().equals(currentUser.getUsername());
-            msg.getUser().setMe(isMe);
-        }
-
-        // Update UI
-        inboxLabel.setText(otherUsername);
-        messageList.getItems().setAll(messages);
-    }
-
-    private String buildConversationId(String userA, String userB) {
-        if (userA.compareToIgnoreCase(userB) <= 0) {
-            return userA + "|" + userB;
-        }
-        return userB + "|" + userA;
-    }
     @FXML
     public void onSendMessage() {
         if (inputMessage == null || inputMessage.getText().trim().isEmpty()) {
             return;
         }
-
-        if (currentConversationId == null || selectedUsername == null) {
+        if (currentConversationId == null) {
             System.err.println("No conversation selected!");
             return;
         }
 
         String text = inputMessage.getText().trim();
+//
+//        // IMMEDIATELY add message to UI with current user as sender
+//        User sender = new User(currentUser.getUsername(), currentUser.getAvatarPath());
+//        sender.setMe(true);
+//        Message outgoingMessage = new Message(sender, text, currentConversationId);
+//        messageList.getItems().add(outgoingMessage);
 
-        // Create new message
-        Message newMessage = new Message(currentUser, text, currentConversationId);
-
-        // Save to database
-        messageRepo.saveMessage(newMessage);
-
-        // Mark as "me" for display
-        newMessage.getUser().setMe(true);
-
-        // Add to UI
-        messageList.getItems().add(newMessage);
-
-        // Clear input field
+        // Then send to server
+        client.sendMessage(currentConversationId, text);
         inputMessage.clear();
     }
 
-    /**
-     * Call this when closing the app to properly close MongoDB connection
-     */
+    public void onCreateConversation() {
+        // create priavte chat or group chat
+    }
+
     public void cleanup() {
-        db.close();
+        client.disconnect();
     }
 }
-
-
-

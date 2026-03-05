@@ -28,7 +28,7 @@ public class MessageCell extends ListCell<Message> {
 
             messageBox.getStyleClass().add("message-box");
 
-            Label usernameLabel = new Label(message.getUser().getUsername());
+            Label usernameLabel = new Label(message.getSender().getUsername());
             usernameLabel.getStyleClass().add("username-label");
 
             Text messageText = new Text(message.getText());
@@ -40,7 +40,7 @@ public class MessageCell extends ListCell<Message> {
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
-            if (message.getUser().isMe()) {
+            if (message.getSender().isMe()) {
 
                 messageBox.getStyleClass().add("message-me");
                 hbox.getChildren().addAll(spacer, messageBox);

@@ -5,22 +5,23 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatterbox.lan.controllers.ChatPageController">
    <left>
-      <HBox prefHeight="400.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <VBox styleClass="side-bar">
+      <VBox prefHeight="400.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <HBox style="-fx-padding: 10;">
             <children>
-               <Button mnemonicParsing="false" text="Button" />
-            </children></VBox>
-         <ListView fx:id="userList" prefHeight="400.0" prefWidth="150.0" styleClass="user-list" />
-      </HBox>
+               <Label text="Conversations" style="-fx-font-size: 14; -fx-font-weight: bold;" />
+            </children>
+         </HBox>
+         <ListView fx:id="conversationList" prefHeight="400.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+      </VBox>
    </left>
    <center>
       <VBox>
-         <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #b5c9e8;">
+         <HBox prefHeight="60.0" prefWidth="200.0" style="-fx-background-color: #b5c9e8; -fx-padding: 10;">
             <children>
-               <Label fx:id="inboxLabel" />
+               <Label fx:id="inboxLabel" text="Select a conversation" style="-fx-font-size: 16; -fx-font-weight: bold;" />
             </children>
          </HBox>
-      <ListView fx:id="messageList" styleClass="message-list"  BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS" />
+         <ListView fx:id="messageList" styleClass="message-list" VBox.vgrow="ALWAYS" />
          <HBox spacing="10" style="-fx-padding: 10; -fx-background-color: #f0f0f0;">
             <children>
                <TextField fx:id="inputMessage" promptText="Type a message..." HBox.hgrow="ALWAYS" />
