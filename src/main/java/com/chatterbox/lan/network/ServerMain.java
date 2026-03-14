@@ -17,8 +17,8 @@ public class ServerMain {
         // Connect to database
         db.connect();
         // Seed database
-        System.out.println("[SERVER] Initializing database...");
-        seedDatabaseIfEmpty();
+//        System.out.println("[SERVER] Initializing database...");
+//        seedDatabaseIfEmpty();
 
 
         try (ServerSocket serverSocket = new ServerSocket(env.getPORT())) {

@@ -30,6 +30,7 @@ public class ServerThread implements Runnable {
             if ("LOGIN".equals(loginReq.getType())) {
                 this.username = loginReq.getUsername();
                 connectedClients.put(username, clientSocket);
+                eventHandler.handleEvent(username, loginReq);
                 System.out.println("[CONNECTED] " + username);
             }
 

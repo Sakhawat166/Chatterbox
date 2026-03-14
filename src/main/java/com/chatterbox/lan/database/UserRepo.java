@@ -44,7 +44,8 @@ public class UserRepo {
         } else {
             // Insert new user
             Document doc = new Document("username", user.getUsername())
-                    .append("avatarPath", user.getAvatarPath());
+                    .append("avatarPath", user.getAvatarPath())
+                    .append("password", user.getPassword());
             userCollection.insertOne(doc);
             return doc.getObjectId("_id").toString();
         }
@@ -57,7 +58,10 @@ public class UserRepo {
         if (doc != null) {
             String id = doc.getObjectId("_id").toString();
             String avatarPath = doc.getString("avatarPath");
-            return new User(id, username, avatarPath);
+            String password = doc.getString("password");
+            User x = new User(id, username, avatarPath);
+            x.setPassword(password);
+            return x;
         }
 
         return null;

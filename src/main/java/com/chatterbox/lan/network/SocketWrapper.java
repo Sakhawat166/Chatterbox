@@ -71,5 +71,12 @@ public class SocketWrapper {
         }
     }
 
+    public String getRemoteAddress() {
+        return socket.getRemoteSocketAddress().toString();
+    }
+
+
+
+
 
 }

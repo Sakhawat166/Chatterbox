@@ -13,7 +13,12 @@ public class Event implements Serializable {
         GET_MESSAGES,
         LOGIN,
         LOGOUT,
-        GET_USERS,
+        LOGIN_SUCCESS,
+        LOGIN_FAILED,
+        GET_CONVERSATIONS,
+        CREATE_CONVERSATION,
+        CONVERSATIONS_UPDATED,
+        NEW_CONVERSATION,
         MESSAGES_RESPONSE,
         USERS_UPDATED,
         NEW_MESSAGE

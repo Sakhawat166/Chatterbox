@@ -7,16 +7,22 @@ public class User implements Serializable {
     private String id;
     private String username;
     private String avatarPath;
+    private String password;
     public boolean isMe;
     public User(String username, String avatarPath) {
         this.username = username;
         this.avatarPath = avatarPath;
+    }
+    public User(String username) {
+        this.username = username;
+
     }
     public User(String id, String username, String avatarPath) {
         this.id = id;
         this.username = username;
         this.avatarPath = avatarPath;
     }
+
 
     public String getId() {
         return id;
@@ -49,4 +55,12 @@ public class User implements Serializable {
     public void setMe(boolean me) {
         isMe = me;
     }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }

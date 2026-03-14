@@ -8,6 +8,7 @@ module com.chatterbox.lan {
     requires org.mongodb.bson;
     requires jdk.httpserver;
     requires jdk.incubator.vector;
+    requires jbcrypt;
 
 
     opens com.chatterbox.lan to javafx.fxml;

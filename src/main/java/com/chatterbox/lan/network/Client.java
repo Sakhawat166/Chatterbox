@@ -3,16 +3,19 @@ package com.chatterbox.lan.network;
 import com.chatterbox.lan.models.*;
 import com.chatterbox.lan.utils.env;
 import java.io.*;
+import java.util.List;
 
 
 public class Client {
     private SocketWrapper socketWrapper;
     private String username;
 
-    private volatile MessageListener messageListener;
+    private volatile Listener listener;
 
-    public interface MessageListener {
-        void onMessageReceived(Event event);
+
+
+    public interface Listener {
+        void onResponseReceived(Event event);
     }
 
     public Client() {
@@ -32,10 +35,11 @@ public class Client {
             e.printStackTrace();
         }
     }
-    public void login(String username) {
+    public void login(String username, String password) {
         this.username = username;
         Event req = new Event("LOGIN");
         req.setUsername(username);
+        req.setData("password", password);
         sendRequest(req);
     }
 
@@ -53,12 +57,18 @@ public class Client {
         sendRequest(req);
     }
 
-    public void getUsers() {
-        Event req = new Event("GET_USERS");
+    public void getConversations() {
+        Event req = new Event("GET_CONVERSATIONS");
         req.setUsername(username);
         sendRequest(req);
     }
-
+    public void createConversation(String name, List<String> members) {
+        Event event = new Event("CREATE_CONVERSATION");
+        event.setUsername(username);
+        event.setData("name", name);
+        event.setData("members", members);
+        sendRequest(event);
+    }
     private void sendRequest(Event event) {
         try {
             if (socketWrapper != null) {
@@ -71,16 +81,16 @@ public class Client {
 
     // Called by ReadThreadClient
     public void handleIncomingEvent(Event event) {
-        MessageListener listener = messageListener;
+        Listener listener = this.listener;
         if (listener != null) {
-            listener.onMessageReceived(event);
+            listener.onResponseReceived(event);
         }
     }
 
 
 
-    public void setMessageListener(MessageListener listener) {
-        this.messageListener = listener;
+    public void setListener(Listener listener) {
+        this.listener = listener;
     }
 
     public void disconnect() {
