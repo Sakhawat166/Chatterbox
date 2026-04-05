@@ -6,22 +6,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Event implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
     public enum Type {
         SEND_MESSAGE,
+        UNSEND_MESSAGE,
         GET_MESSAGES,
         LOGIN,
+        REGISTER,
         LOGOUT,
         LOGIN_SUCCESS,
         LOGIN_FAILED,
+        REGISTER_SUCCESS,
+        REGISTER_FAILED,
         GET_CONVERSATIONS,
         CREATE_CONVERSATION,
+        CREATE_CONVERSATION_FAILED,
         CONVERSATIONS_UPDATED,
         NEW_CONVERSATION,
         MESSAGES_RESPONSE,
         USERS_UPDATED,
-        NEW_MESSAGE
+        NEW_MESSAGE,
+        CALL_REQUEST,
+        CALL_ACCEPTED,
+        CALL_REJECTED,
+        CALL_ENDED,
+        CALL_AUDIO,
+        CALL_VIDEO_FRAME
     }
 
     private Type type;

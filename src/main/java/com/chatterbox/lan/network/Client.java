@@ -35,6 +35,11 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    public boolean isConnected() {
+        return socketWrapper != null;
+    }
+
     public void login(String username, String password) {
         this.username = username;
         Event req = new Event("LOGIN");
@@ -43,11 +48,41 @@ public class Client {
         sendRequest(req);
     }
 
+    public void register(User user) {
+        this.username = user.getUsername();
+        Event req = new Event("REGISTER");
+        req.setUsername(user.getUsername());
+        req.setData("password", user.getPassword());
+        req.setData("avatarPath", user.getAvatarPath());
+        req.setData("firstName", user.getFirstName());
+        req.setData("lastName", user.getLastName());
+        req.setData("email", user.getEmail());
+        req.setData("phoneNumber", user.getPhoneNumber());
+        req.setData("location", user.getLocation());
+        sendRequest(req);
+    }
+
 
     public void sendMessage(String conversationId, String text) {
         Event req = new Event("SEND_MESSAGE");
         req.setConversationId(conversationId);
         req.setText(text);
+        sendRequest(req);
+    }
+    public void unsendMessage(String conversationId, String messageId) {
+        Event req = new Event("UNSEND_MESSAGE");
+        req.setConversationId(conversationId);
+        req.setData("messageId", messageId);
+        sendRequest(req);
+    }
+
+    public void sendFileMessage(String conversationId, String fileName, byte[] fileData) {
+        Event req = new Event("SEND_MESSAGE");
+        req.setConversationId(conversationId);
+        req.setText(fileName);
+        req.setData("messageType", "FILE");
+        req.setData("fileName", fileName);
+        req.setData("fileData", fileData);
         sendRequest(req);
     }
 
@@ -69,6 +104,64 @@ public class Client {
         event.setData("members", members);
         sendRequest(event);
     }
+
+    public void requestCall(String targetUser) {
+        sendCallControlEvent("CALL_REQUEST", targetUser, "AUDIO");
+    }
+
+    public void requestVideoCall(String targetUser) {
+        sendCallControlEvent("CALL_REQUEST", targetUser, "VIDEO");
+    }
+
+    public void acceptCall(String targetUser) {
+        sendCallControlEvent("CALL_ACCEPTED", targetUser, "AUDIO");
+    }
+
+    public void acceptCall(String targetUser, String callMode) {
+        sendCallControlEvent("CALL_ACCEPTED", targetUser, callMode);
+    }
+
+    public void rejectCall(String targetUser) {
+        sendCallControlEvent("CALL_REJECTED", targetUser, "AUDIO");
+    }
+
+    public void rejectCall(String targetUser, String callMode) {
+        sendCallControlEvent("CALL_REJECTED", targetUser, callMode);
+    }
+
+    public void endCall(String targetUser) {
+        sendCallControlEvent("CALL_ENDED", targetUser, "AUDIO");
+    }
+
+    public void endCall(String targetUser, String callMode) {
+        sendCallControlEvent("CALL_ENDED", targetUser, callMode);
+    }
+
+    private void sendCallControlEvent(String type, String targetUser, String callMode) {
+        Event event = new Event("CALL_REQUEST");
+        event.setType(type);
+        event.setUsername(username);
+        event.setData("targetUser", targetUser);
+        event.setData("callMode", callMode);
+        sendRequest(event);
+    }
+
+    public void sendCallAudio(String targetUser, byte[] audioChunk) {
+        Event event = new Event("CALL_AUDIO");
+        event.setUsername(username);
+        event.setData("targetUser", targetUser);
+        event.setData("audioChunk", audioChunk);
+        sendRequest(event);
+    }
+
+    public void sendCallVideoFrame(String targetUser, byte[] imageBytes) {
+        Event event = new Event("CALL_VIDEO_FRAME");
+        event.setUsername(username);
+        event.setData("targetUser", targetUser);
+        event.setData("imageBytes", imageBytes);
+        sendRequest(event);
+    }
+
     private void sendRequest(Event event) {
         try {
             if (socketWrapper != null) {

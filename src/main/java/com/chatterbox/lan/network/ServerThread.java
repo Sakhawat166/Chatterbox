@@ -18,7 +18,7 @@ public class ServerThread implements Runnable {
     public ServerThread(SocketWrapper clientSocket, ConcurrentHashMap<String, SocketWrapper> connectedClients, EventHandler eventHandler) {
         this.clientSocket = clientSocket;
         this.connectedClients = connectedClients;
-            this.eventHandler = eventHandler;
+        this.eventHandler = eventHandler;
     }
 
 
@@ -27,7 +27,7 @@ public class ServerThread implements Runnable {
         try {
             Event loginReq = (Event) clientSocket.read();
 
-            if ("LOGIN".equals(loginReq.getType())) {
+            if ("LOGIN".equals(loginReq.getType()) || "REGISTER".equals(loginReq.getType())) {
                 this.username = loginReq.getUsername();
                 connectedClients.put(username, clientSocket);
                 eventHandler.handleEvent(username, loginReq);

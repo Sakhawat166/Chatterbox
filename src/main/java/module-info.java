@@ -9,6 +9,9 @@ module com.chatterbox.lan {
     requires jdk.httpserver;
     requires jdk.incubator.vector;
     requires jbcrypt;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.fontawesome5;
+    requires webcam.capture;
 
 
     opens com.chatterbox.lan to javafx.fxml;

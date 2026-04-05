@@ -38,14 +38,25 @@ public class UserRepo {
             //Update existing user
             userCollection.updateOne(
                     new Document("username", user.getUsername()),
-                    new Document("$set", new Document("avatarPath", user.getAvatarPath()))
+                    new Document("$set", new Document("avatarPath", user.getAvatarPath())
+                            .append("password", user.getPassword())
+                            .append("firstName", user.getFirstName())
+                            .append("lastName", user.getLastName())
+                            .append("email", user.getEmail())
+                            .append("phoneNumber", user.getPhoneNumber())
+                            .append("location", user.getLocation()))
             );
             return existingUser.getObjectId("_id").toString();
         } else {
             // Insert new user
             Document doc = new Document("username", user.getUsername())
                     .append("avatarPath", user.getAvatarPath())
-                    .append("password", user.getPassword());
+                    .append("password", user.getPassword())
+                    .append("firstName", user.getFirstName())
+                    .append("lastName", user.getLastName())
+                    .append("email", user.getEmail())
+                    .append("phoneNumber", user.getPhoneNumber())
+                    .append("location", user.getLocation());
             userCollection.insertOne(doc);
             return doc.getObjectId("_id").toString();
         }
@@ -61,10 +72,19 @@ public class UserRepo {
             String password = doc.getString("password");
             User x = new User(id, username, avatarPath);
             x.setPassword(password);
+            x.setFirstName(doc.getString("firstName"));
+            x.setLastName(doc.getString("lastName"));
+            x.setEmail(doc.getString("email"));
+            x.setPhoneNumber(doc.getString("phoneNumber"));
+            x.setLocation(doc.getString("location"));
             return x;
         }
 
         return null;
+    }
+
+    public boolean usernameExists(String username) {
+        return userCollection.find(new Document("username", username)).first() != null;
     }
 
 

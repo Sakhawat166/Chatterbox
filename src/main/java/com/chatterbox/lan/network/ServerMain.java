@@ -13,9 +13,9 @@ public class ServerMain {
 
     public ServerMain() {
         connectedClients = new ConcurrentHashMap<>();
-        initEventHandler();
         // Connect to database
         db.connect();
+        initEventHandler();
         // Seed database
 //        System.out.println("[SERVER] Initializing database...");
 //        seedDatabaseIfEmpty();

@@ -4,7 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5b872ad3-50da-4638-b03f-c5a287436a9d" name="Changes" comment="add friend &amp; create groups done" />
+    <list default="true" id="5b872ad3-50da-4638-b03f-c5a287436a9d" name="Changes" comment="add friend &amp; create groups done">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/image/Orbitron-Medium.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/image/default.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/MainApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/MainApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/ChatPageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/ChatPageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/MessageCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/controllers/MessageCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/database/MessageRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/database/MessageRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/database/UserRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/database/UserRepo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Conversation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Conversation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Event.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ClientThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ClientThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/EventHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/EventHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ServerMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ServerMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ServerThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/chatterbox/lan/network/ServerThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/ChatPage-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/ChatPage-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/Login-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/Login-view.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/chatterbox/lan/style.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +40,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="40" />
+    <option name="cachedIndexableFilesCount" value="50" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -77,6 +101,7 @@
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/IdeaProjects/Chatterbox/src/main/resources&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -86,7 +111,15 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.MainApp Client 2">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\User\IdeaProjects\Chatterbox\src\main\resources\image" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.chatterbox.lan.network" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.MainApp Client 1">
     <configuration name="DatabaseCleaner" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.chatterbox.lan.database.DatabaseCleaner" />
       <module name="Chatterbox" />
@@ -156,10 +189,10 @@
     <list>
       <item itemvalue="Application.MainApp Client 1" />
       <item itemvalue="Application.MainApp Client 2" />
-      <item itemvalue="Application.db" />
       <item itemvalue="Application.DatabaseCleaner" />
       <item itemvalue="Application.MainApp" />
       <item itemvalue="Application.ServerMain" />
+      <item itemvalue="Application.db" />
     </list>
     <recent_temporary>
       <list>
@@ -225,7 +258,23 @@
       <option name="project" value="LOCAL" />
       <updated>1773509429687</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="add friend &amp; create groups done">
+      <option name="closed" value="true" />
+      <created>1773512074144</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1773512074144</updated>
+    </task>
+    <task id="LOCAL-00006" summary="add friend &amp; create groups done">
+      <option name="closed" value="true" />
+      <created>1773512084582</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1773512084582</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

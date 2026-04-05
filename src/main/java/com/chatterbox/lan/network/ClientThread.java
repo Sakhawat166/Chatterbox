@@ -4,8 +4,8 @@ import com.chatterbox.lan.models.Event;
 
 public class ClientThread implements Runnable {
 
-  private final SocketWrapper socketWrapper;
-  private final Client client;
+    private final SocketWrapper socketWrapper;
+    private final Client client;
 
     public ClientThread(SocketWrapper socketWrapper, Client client) {
 
