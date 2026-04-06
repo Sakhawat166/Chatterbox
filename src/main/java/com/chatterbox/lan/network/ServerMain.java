@@ -16,10 +16,6 @@ public class ServerMain {
         // Connect to database
         db.connect();
         initEventHandler();
-        // Seed database
-//        System.out.println("[SERVER] Initializing database...");
-//        seedDatabaseIfEmpty();
-
 
         try (ServerSocket serverSocket = new ServerSocket(env.getPORT())) {
             System.out.println("[SERVER] Running on port " + env.getPORT());
@@ -41,34 +37,6 @@ public class ServerMain {
         ConversationRepo conversationRepo = new ConversationRepo();
 
         eventHandler = new EventHandler(connectedClients, messageRepo, userRepo, conversationRepo);
-    }
-
-
-    private void seedDatabaseIfEmpty() {
-        try {
-            UserRepo userRepo = new UserRepo();
-            int userCount = userRepo.getAllUsers().size();
-
-            System.out.println("[SERVER] Checking database... Found " + userCount + " users");
-
-            if (userCount == 0) {
-                System.out.println("[SERVER] Database is empty, seeding test data...");
-                DatabaseSeeder.seedDatabase();
-
-                // Verify seeding was successful
-                int newUserCount = userRepo.getAllUsers().size();
-                System.out.println("[SERVER] Seeding complete. Now have " + newUserCount + " users");
-
-                if (newUserCount == 0) {
-                    System.err.println("[SERVER] WARNING: Seeding failed - no users were created!");
-                }
-            } else {
-                System.out.println("[SERVER] Database already has data, skipping seed");
-            }
-        } catch (Exception e) {
-            System.err.println("[SERVER] Error during seeding: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
 

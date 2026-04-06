@@ -69,12 +69,6 @@ public class Client {
         req.setText(text);
         sendRequest(req);
     }
-    public void unsendMessage(String conversationId, String messageId) {
-        Event req = new Event("UNSEND_MESSAGE");
-        req.setConversationId(conversationId);
-        req.setData("messageId", messageId);
-        sendRequest(req);
-    }
 
     public void sendFileMessage(String conversationId, String fileName, byte[] fileData) {
         Event req = new Event("SEND_MESSAGE");
@@ -83,6 +77,13 @@ public class Client {
         req.setData("messageType", "FILE");
         req.setData("fileName", fileName);
         req.setData("fileData", fileData);
+        sendRequest(req);
+    }
+
+    public void unsendMessage(String conversationId, String messageId) {
+        Event req = new Event("UNSEND_MESSAGE");
+        req.setConversationId(conversationId);
+        req.setData("messageId", messageId);
         sendRequest(req);
     }
 
@@ -97,6 +98,13 @@ public class Client {
         req.setUsername(username);
         sendRequest(req);
     }
+
+    public void getUsers() {
+        Event req = new Event("GET_USERS");
+        req.setUsername(username);
+        sendRequest(req);
+    }
+
     public void createConversation(String name, List<String> members) {
         Event event = new Event("CREATE_CONVERSATION");
         event.setUsername(username);

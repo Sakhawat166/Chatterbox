@@ -10,8 +10,9 @@ public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
     public enum Type {
         SEND_MESSAGE,
-        UNSEND_MESSAGE,
         GET_MESSAGES,
+        UNSEND_MESSAGE,
+        MESSAGE_DELETED,
         LOGIN,
         REGISTER,
         LOGOUT,
@@ -20,6 +21,7 @@ public class Event implements Serializable {
         REGISTER_SUCCESS,
         REGISTER_FAILED,
         GET_CONVERSATIONS,
+        GET_USERS,
         CREATE_CONVERSATION,
         CREATE_CONVERSATION_FAILED,
         CONVERSATIONS_UPDATED,
@@ -32,8 +34,7 @@ public class Event implements Serializable {
         CALL_REJECTED,
         CALL_ENDED,
         CALL_AUDIO,
-        CALL_VIDEO_FRAME
-    }
+        CALL_VIDEO_FRAME    }
 
     private Type type;
     private String username;

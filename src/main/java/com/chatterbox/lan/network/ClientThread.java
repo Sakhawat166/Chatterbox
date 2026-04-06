@@ -26,7 +26,7 @@ public class ClientThread implements Runnable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("[CLIENT] Read thread stopped");
+            System.out.println("[CLIENT] Read thread stopped" );
         }
     }
 }

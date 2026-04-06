@@ -8,6 +8,7 @@ import com.chatterbox.lan.utils.Loginout;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Callback;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
@@ -37,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class ChatPageController {
 
     private Client client;
     private User currentUser;
+    private User viewedProfileUser;
     private String currentConversationId;
     private Conversation currentConversation;
     private final AudioCallManager audioCallManager = new AudioCallManager();
@@ -62,11 +66,14 @@ public class ChatPageController {
     private final Set<String> selectedGroupMembers = new HashSet<>();
 
 
+
     @FXML
     private ListView<Message> messageList;
 
     @FXML
     private ListView<Conversation> conversationList;
+    @FXML
+    private VBox conversationLoadingOverlay;
 
     @FXML
     private Label inboxLabel;
@@ -76,6 +83,8 @@ public class ChatPageController {
 
     @FXML
     private ImageView headerAvatar;
+    @FXML
+    private Pane headerActiveStatusDot;
 
     @FXML
     private TextField inputMessage;
@@ -95,92 +104,56 @@ public class ChatPageController {
     @FXML
     private Label callNotificationLabel;
 
-    @FXML
-    private VBox createConversationOverlay;
-    @FXML
-    private TextField conversationNameField;
-    @FXML
-    private ListView<String> availableUsersList;
+    @FXML private VBox createConversationOverlay;
+    @FXML private TextField conversationNameField;
+    @FXML private ListView<String> availableUsersList;
+    @FXML private VBox messageLoadingOverlay;
 
 
-    @FXML
-    private VBox addFriendOverlay;
-    @FXML
-    private TextField friendUserNameField;
-    @FXML
-    private VBox sidebarDrawer;
-    @FXML
-    private VBox sidebarContent;
-    @FXML
-    private VBox ownIdSidebarSections;
-    @FXML
-    private Label sidebarTitleLabel;
-    @FXML
-    private Button addFriendButton;
-    @FXML
-    private Button createGroupButton;
-    @FXML
-    private Button myIdButton;
-    @FXML
-    private Button drawerToggleButton;
-    @FXML
-    private StackPane rootContainer;
-    @FXML
-    private StackPane sidebarPane;
-    @FXML
-    private VBox chatContent;
-    @FXML
-    private VBox ownIdPage;
-    @FXML
-    private ImageView ownIdAvatar;
-    @FXML
-    private Label ownIdUsernameLabel;
-    @FXML
-    private Label ownIdFirstNameLabel;
-    @FXML
-    private Label ownIdLastNameLabel;
-    @FXML
-    private Label ownIdEmailLabel;
-    @FXML
-    private Label ownIdPhoneLabel;
-    @FXML
-    private Label ownIdLocationLabel;
-    @FXML
-    private Button personalDetailsButton;
-    @FXML
-    private Button editDetailsButton;
-    @FXML
-    private Button changePasswordButton;
-    @FXML
-    private VBox personalDetailsView;
-    @FXML
-    private VBox editDetailsView;
-    @FXML
-    private VBox changePasswordView;
-    @FXML
-    private TextField editAvatarField;
-    @FXML
-    private TextField editUsernameField;
-    @FXML
-    private TextField editFirstNameField;
-    @FXML
-    private TextField editLastNameField;
-    @FXML
-    private TextField editEmailField;
-    @FXML
-    private TextField editPhoneField;
-    @FXML
-    private TextField editLocationField;
-    @FXML
-    private Label editDetailsMessageLabel;
-    @FXML
-    private PasswordField currentPasswordField;
-    @FXML
-    private PasswordField newPasswordField;
-    @FXML
-    private PasswordField confirmPasswordField;
-    @FXML
-    private Label changePasswordMessageLabel;
+    @FXML private VBox addFriendOverlay;
+    @FXML private TextField friendUserNameField;
+    @FXML private ListView<String> friendSuggestionsList;
+    @FXML private ListView<String> onlineUsersList;
+    @FXML private VBox onlineUsersSection;
+    @FXML private VBox sidebarDrawer;
+    @FXML private VBox sidebarContent;
+    @FXML private VBox ownIdSidebarSections;
+    @FXML private Label sidebarTitleLabel;
+    @FXML private Button addFriendButton;
+    @FXML private Button createGroupButton;
+    @FXML private Button myIdButton;
+    @FXML private Button drawerToggleButton;
+    @FXML private StackPane rootContainer;
+    @FXML private StackPane sidebarPane;
+    @FXML private VBox chatContent;
+    @FXML private VBox ownIdPage;
+    @FXML private Button recipientInfoCloseButton;
+    @FXML private ImageView ownIdAvatar;
+    @FXML private Pane ownIdActiveStatusDot;
+    @FXML private Label ownIdUsernameLabel;
+    @FXML private Label ownIdFirstNameLabel;
+    @FXML private Label ownIdLastNameLabel;
+    @FXML private Label ownIdEmailLabel;
+    @FXML private Label ownIdPhoneLabel;
+    @FXML private Label ownIdLocationLabel;
+    @FXML private Button personalDetailsButton;
+    @FXML private Button editDetailsButton;
+    @FXML private Button changePasswordButton;
+    @FXML private VBox personalDetailsView;
+    @FXML private VBox editDetailsView;
+    @FXML private VBox changePasswordView;
+    @FXML private TextField editAvatarField;
+    @FXML private TextField editUsernameField;
+    @FXML private TextField editFirstNameField;
+    @FXML private TextField editLastNameField;
+    @FXML private TextField editEmailField;
+    @FXML private TextField editPhoneField;
+    @FXML private TextField editLocationField;
+    @FXML private Label editDetailsMessageLabel;
+    @FXML private PasswordField currentPasswordField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private Label changePasswordMessageLabel;
 
     @FXML
     public void initialize() {
@@ -190,11 +163,14 @@ public class ChatPageController {
 
             private final Label nameLabel = new Label();
             private final ImageView avatarView = createCircularAvatar(34);
-            private final HBox container = new HBox(avatarView, nameLabel);
+            private final Pane statusDot = createActiveStatusDot(10, 2, 1);
+            private final StackPane avatarContainer = new StackPane(avatarView, statusDot);
+            private final HBox container = new HBox(avatarContainer, nameLabel);
 
             {
                 container.setSpacing(10);
                 container.getStyleClass().add("conversation-list-item");
+                avatarContainer.getStyleClass().add("avatar-status-container");
                 nameLabel.getStyleClass().add("conversation-list-name");
             }
 
@@ -281,7 +257,26 @@ public class ChatPageController {
                 }
             }
         });
+        if (friendSuggestionsList != null) {
+            friendSuggestionsList.setCellFactory(createUserPickerCellFactory(friendSuggestionsList));
+        }
         availableUsersList.setItems(friends);
+        if (friendSuggestionsList != null) {
+            friendSuggestionsList.setItems(FXCollections.observableArrayList());
+            friendSuggestionsList.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue != null && friendUserNameField != null) {
+                    friendUserNameField.setText(newValue);
+                }
+            });
+        }
+        if (onlineUsersList != null) {
+            onlineUsersList.setItems(FXCollections.observableArrayList());
+            onlineUsersList.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue != null && friendUserNameField != null) {
+                    friendUserNameField.setText(newValue);
+                }
+            });
+        }
         // Hide overlays initially
         if (createConversationOverlay != null) createConversationOverlay.setVisible(false);
         if (addFriendOverlay != null) addFriendOverlay.setVisible(false);
@@ -293,6 +288,8 @@ public class ChatPageController {
             applyCircularClip(ownIdAvatar, 46);
             ownIdAvatar.setImage(DEFAULT_AVATAR);
         }
+        configureOwnIdStatusDot();
+        refreshActiveStatusIndicators();
         setDrawerVisible(false);
         showOwnIdSection("personal");
         if (sidebarPane != null && sidebarDrawer != null) {
@@ -301,6 +298,8 @@ public class ChatPageController {
         if (rootContainer != null) {
             rootContainer.addEventFilter(MouseEvent.MOUSE_PRESSED, this::handleRootMousePressed);
         }
+        setConversationListLoading(false);
+        setMessageLoading(false);
 
     }
 
@@ -311,6 +310,7 @@ public class ChatPageController {
         if (myIdButton != null && currentUser != null) {
             myIdButton.setText(currentUser.getUsername());
         }
+        refreshActiveStatusIndicators();
 
         client.setListener(event -> {
             if ("CALL_AUDIO".equals(event.getType())) {
@@ -323,6 +323,7 @@ public class ChatPageController {
                     case "NEW_MESSAGE" -> handleIncomingMessage(event);
                     case "MESSAGES_RESPONSE" -> handleMessagesResponse(event);
                     case "MESSAGE_DELETED" -> handleMessageDeleted(event);
+                    case "USERS_UPDATED" -> handleUsersUpdate(event);
                     case "CONVERSATIONS_UPDATED" -> handleConversationsUpdate(event);
                     case "NEW_CONVERSATION" -> handleNewConversation(event);
                     case "CREATE_CONVERSATION_FAILED" -> handleCreateConversationFailed(event);
@@ -334,6 +335,7 @@ public class ChatPageController {
                     default -> System.err.println("[CLIENT] Unknown event type: " + event.getType());
                 }
             });
+
         });
 
         conversationList.getSelectionModel()
@@ -345,22 +347,28 @@ public class ChatPageController {
                 });
 
         // Fetch conversations immediately after login
+        setConversationListLoading(true);
         client.getConversations();
     }
 
     private void appendMessages(List<Message> messages) {
         messageList.getItems().addAll(messages);
-        if (!messageList.getItems().isEmpty()) {
+        if (!messages.isEmpty()) {
             messageList.scrollTo(messageList.getItems().size() - 1);
         }
     }
 
     private void onConversationSelected(Conversation conversation) {
+        if (isRecipientProfileVisible()) {
+            showProfilePane(false, false);
+        }
         if (conversation == null) {
             currentConversationId = null;
             currentConversation = null;
             messageList.getItems().clear();
             setConversationSelected(false);
+            setMessageLoading(false);
+            refreshActiveStatusIndicators();
             return;
         }
         currentConversation = conversation;
@@ -370,6 +378,8 @@ public class ChatPageController {
             headerAvatar.setImage(loadConversationAvatar(conversation));
         }
         setConversationSelected(true);
+        refreshActiveStatusIndicators();
+        setMessageLoading(true);
         client.getMessages(currentConversationId);
     }
 
@@ -436,6 +446,66 @@ public class ChatPageController {
         return imageView;
     }
 
+    private Pane createActiveStatusDot(double size, double borderWidth, double offset) {
+        Pane statusDot = new Pane();
+        statusDot.getStyleClass().add("active-status-dot");
+        statusDot.setMouseTransparent(true);
+        statusDot.setPrefSize(size, size);
+        statusDot.setMinSize(size, size);
+        statusDot.setMaxSize(size, size);
+        statusDot.setStyle("-fx-border-width: " + borderWidth + ";");
+        StackPane.setAlignment(statusDot, javafx.geometry.Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(statusDot, new javafx.geometry.Insets(0, offset, offset, 0));
+        return statusDot;
+    }
+
+    private Callback<ListView<String>, ListCell<String>> createUserPickerCellFactory(ListView<String> listView) {
+        return list -> new ListCell<>() {
+            private final ImageView avatarView = createCircularAvatar(28);
+            private final Label nameLabel = new Label();
+            private final HBox container = new HBox(avatarView, nameLabel);
+
+            {
+                container.setSpacing(10);
+                container.getStyleClass().add("available-user-item");
+                nameLabel.getStyleClass().add("available-user-name");
+                setOnMousePressed(event -> {
+                    if (event.getButton() != MouseButton.PRIMARY || getItem() == null) {
+                        return;
+                    }
+                    listView.getSelectionModel().select(getItem());
+                    event.consume();
+                });
+            }
+
+            @Override
+            protected void updateItem(String username, boolean empty) {
+                super.updateItem(username, empty);
+                if (empty || username == null) {
+                    setGraphic(null);
+                    setText(null);
+                    pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, false);
+                    container.pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, false);
+                } else {
+                    nameLabel.setText(username);
+                    avatarView.setImage(loadAvatarForUsername(username));
+                    setGraphic(container);
+                    setText(null);
+                    boolean selected = isSelected();
+                    pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, selected);
+                    container.pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, selected);
+                }
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(selected);
+                pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, selected);
+                container.pseudoClassStateChanged(SELECTED_PSEUDO_CLASS, selected);
+            }
+        };
+    }
+
     private void applyCircularClip(ImageView imageView, double radius) {
         Circle clip = new Circle(radius, radius, radius);
         imageView.setClip(clip);
@@ -469,6 +539,24 @@ public class ChatPageController {
         }
         client.requestVideoCall(targetUser);
         showCallNotification("Video calling " + targetUser + "...");
+    }
+
+    @FXML
+    public void onShowRecipientInfo() {
+        String targetUser = getDirectCallTarget();
+        if (targetUser == null) {
+            showInfo("Recipient Info", "Recipient info currently supports one-to-one conversations only.");
+            return;
+        }
+
+        User recipient = userRepo.getUserByUsername(targetUser);
+        if (recipient == null) {
+            showInfo("Recipient Info", "No saved information was found for " + targetUser + ".");
+            return;
+        }
+        showProfile(recipient, false);
+        showOwnIdSection("personal");
+        showProfilePane(true, false);
     }
 
     private void handleIncomingCall(Event event) {
@@ -714,6 +802,7 @@ public class ChatPageController {
     }
 
 
+
     // for loading conversations in the left pane when user logs in
     private void handleConversationsUpdate(Event event) {
         @SuppressWarnings("unchecked")
@@ -721,6 +810,7 @@ public class ChatPageController {
 
         if (conversations == null) {
             System.err.println("No conversations in response");
+            setConversationListLoading(false);
             return;
         }
         for (Conversation conv : conversations) {
@@ -732,6 +822,7 @@ public class ChatPageController {
         }
         conversationList.getItems().clear();
         conversationList.getItems().addAll(conversations);
+        setConversationListLoading(false);
         System.out.println("[CONTROLLER] Updated conversations: " + conversations.size() + " conversations");
     }
 
@@ -769,16 +860,45 @@ public class ChatPageController {
         );
     }
 
+    private void handleUsersUpdate(Event event) {
+        @SuppressWarnings("unchecked")
+        List<String> suggestions = (List<String>) event.getData("suggestions");
+        @SuppressWarnings("unchecked")
+        List<String> onlineUsers = (List<String>) event.getData("onlineUsers");
+
+        LinkedHashMap<String, String> combinedSuggestions = new LinkedHashMap<>();
+        if (onlineUsers != null) {
+            for (String username : onlineUsers) {
+                combinedSuggestions.put(username, username);
+            }
+        }
+        if (suggestions != null) {
+            for (String username : suggestions) {
+                combinedSuggestions.putIfAbsent(username, username);
+            }
+        }
+
+        if (friendSuggestionsList != null) {
+            friendSuggestionsList.getItems().setAll(combinedSuggestions.values());
+        }
+        if (onlineUsersList != null) {
+            onlineUsersList.getItems().clear();
+        }
+        if (onlineUsersSection != null) {
+            onlineUsersSection.setVisible(false);
+            onlineUsersSection.setManaged(false);
+        }
+    }
+
 
     // for loading new incoming message in real-time
     private void handleIncomingMessage(Event event) {
         if (currentConversationId == null || !currentConversationId.equals(event.getConversationId())) return;
 
+        String messageId = (String) event.getData("messageId");
         User sender = new User(event.getUsername(), "/avatars/default.png");
         sender.setMe(sender.getUsername().equals(currentUser.getUsername()));
         String messageType = event.getData("messageType") instanceof String type ? type : "TEXT";
-        String messageId = (String) event.getData("messageId");
-
         Message incoming = "FILE".equals(messageType)
                 ? new Message(
                 sender,
@@ -787,8 +907,8 @@ public class ChatPageController {
                 event.getConversationId()
         )
                 : new Message(sender, event.getText(), event.getConversationId());
-        incoming.setId(messageId);
         appendMessages(List.of(incoming));
+        incoming.setId(messageId);
     }
 
     // for loading all message of a conversation when selected
@@ -797,6 +917,7 @@ public class ChatPageController {
         List<Message> messages = (List<Message>) event.getData("messages");
         if (messages == null) {
             System.err.println("No messages in response");
+            setMessageLoading(false);
             return;
         }
 
@@ -808,10 +929,11 @@ public class ChatPageController {
             }
         }
 
-
         messageList.getItems().clear();
         appendMessages(messages);
+        setMessageLoading(false);
     }
+
     private void handleMessageDeleted(Event event) {
         String conversationId = event.getConversationId();
         String messageId = (String) event.getData("messageId");
@@ -833,17 +955,9 @@ public class ChatPageController {
         }
 
         if (changed) {
-            // Find the index again and set the item back into the list
-            for (int i = 0; i < messageList.getItems().size(); i++) {
-                if (messageId.equals(messageList.getItems().get(i).getId())) {
-                    Message updatedMsg = messageList.getItems().get(i);
-                    messageList.getItems().set(i, updatedMsg); // This forces the Cell to update
-                    break;
-                }
-            }
+            messageList.refresh();
         }
     }
-
 
 
     @FXML
@@ -869,18 +983,20 @@ public class ChatPageController {
         inputMessage.clear();
     }
 
+    @FXML
     public void onUnsendMessage(Message message) {
+        String messageId = message.getId();
         if (message == null || currentConversationId == null || message.getSender() == null || currentUser == null) {
             return;
         }
         if (!currentUser.getUsername().equals(message.getSender().getUsername())) {
             return;
         }
-        if (message.getId() == null || message.getId().isBlank()) {
+        if (messageId == null || messageId.isBlank()) {
             System.err.println("Cannot unsend: message ID is missing");
             return;
         }
-        client.unsendMessage(currentConversationId, message.getId());
+        client.unsendMessage(currentConversationId, messageId);
     }
 
     @FXML
@@ -971,21 +1087,26 @@ public class ChatPageController {
     @FXML
     public void onShowOwnId() {
         setDrawerVisible(false);
-        populateOwnIdCard();
+        showProfile(currentUser, true);
         populateEditDetailsForm();
         showOwnIdSection("personal");
-        showOwnIdPage(true);
+        showProfilePane(true, true);
     }
 
     @FXML
     public void onShowChats() {
         setDrawerVisible(false);
-        showOwnIdPage(false);
+        showProfilePane(false, false);
     }
 
     @FXML
     public void onCloseOwnId() {
-        showOwnIdPage(false);
+        showProfilePane(false, false);
+    }
+
+    @FXML
+    public void onCloseRecipientInfo() {
+        showProfilePane(false, false);
     }
 
     @FXML
@@ -995,12 +1116,18 @@ public class ChatPageController {
 
     @FXML
     public void onShowEditDetails() {
+        if (!isViewingOwnProfile()) {
+            return;
+        }
         populateEditDetailsForm();
         showOwnIdSection("edit");
     }
 
     @FXML
     public void onShowChangePassword() {
+        if (!isViewingOwnProfile()) {
+            return;
+        }
         clearChangePasswordForm();
         showOwnIdSection("password");
     }
@@ -1048,7 +1175,6 @@ public class ChatPageController {
         conversationNameField.clear();
         availableUsersList.refresh();
     }
-
     @FXML
     public void onSubmitCreateConversation() {
         String name = conversationNameField.getText().trim();
@@ -1079,7 +1205,6 @@ public class ChatPageController {
 
         onCloseCreateConversation();
     }
-
     @FXML
     public void onOpenAddFriend() {
         if (addFriendOverlay != null) {
@@ -1087,6 +1212,15 @@ public class ChatPageController {
             addFriendOverlay.setManaged(true);
         }
         friendUserNameField.clear();
+        if (friendSuggestionsList != null) {
+            friendSuggestionsList.getItems().clear();
+        }
+        if (onlineUsersList != null) {
+            onlineUsersList.getItems().clear();
+        }
+        if (client != null) {
+            client.getUsers();
+        }
     }
 
     @FXML
@@ -1096,8 +1230,13 @@ public class ChatPageController {
             addFriendOverlay.setManaged(false);
         }
         friendUserNameField.clear();
+        if (friendSuggestionsList != null) {
+            friendSuggestionsList.getSelectionModel().clearSelection();
+        }
+        if (onlineUsersList != null) {
+            onlineUsersList.getSelectionModel().clearSelection();
+        }
     }
-
     @FXML
     public void onSubmitAddFriend() {
         String friendUsername = friendUserNameField.getText().trim();
@@ -1140,18 +1279,94 @@ public class ChatPageController {
     }
 
     private void populateOwnIdCard() {
-        if (ownIdUsernameLabel == null || currentUser == null) {
+        if (ownIdUsernameLabel == null) {
+            return;
+        }
+        User profileUser = viewedProfileUser != null ? viewedProfileUser : currentUser;
+        if (profileUser == null) {
             return;
         }
 
-        String username = safeValue(currentUser.getUsername());
+        String username = safeValue(profileUser.getUsername());
         ownIdUsernameLabel.setText(username);
-        ownIdFirstNameLabel.setText(profileValue(currentUser.getFirstName()));
-        ownIdLastNameLabel.setText(profileValue(currentUser.getLastName()));
-        ownIdEmailLabel.setText(profileValue(currentUser.getEmail()));
-        ownIdPhoneLabel.setText(profileValue(currentUser.getPhoneNumber()));
-        ownIdLocationLabel.setText(profileValue(currentUser.getLocation()));
-        ownIdAvatar.setImage(loadAvatarImage(currentUser.getAvatarPath()));
+        ownIdFirstNameLabel.setText(profileValue(profileUser.getFirstName()));
+        ownIdLastNameLabel.setText(profileValue(profileUser.getLastName()));
+        ownIdEmailLabel.setText(profileValue(profileUser.getEmail()));
+        ownIdPhoneLabel.setText(profileValue(profileUser.getPhoneNumber()));
+        ownIdLocationLabel.setText(profileValue(profileUser.getLocation()));
+        ownIdAvatar.setImage(loadAvatarImage(profileUser.getAvatarPath()));
+        refreshActiveStatusIndicators();
+    }
+
+    private void showProfile(User profileUser, boolean ownProfile) {
+        viewedProfileUser = profileUser;
+        populateOwnIdCard();
+        updateOwnIdNavigationForProfile(ownProfile);
+    }
+
+    private void refreshActiveStatusIndicators() {
+        setNodeVisible(headerActiveStatusDot, currentConversation != null);
+        setNodeVisible(ownIdActiveStatusDot, isViewingOwnProfile());
+        if (headerActiveStatusDot != null) {
+            headerActiveStatusDot.toFront();
+        }
+        if (ownIdActiveStatusDot != null) {
+            ownIdActiveStatusDot.toFront();
+        }
+    }
+
+    private void setNodeVisible(Node node, boolean visible) {
+        if (node == null) {
+            return;
+        }
+        node.setVisible(visible);
+        node.setManaged(visible);
+    }
+
+    private void configureOwnIdStatusDot() {
+        if (ownIdActiveStatusDot == null) {
+            return;
+        }
+        ownIdActiveStatusDot.setPrefSize(18, 18);
+        ownIdActiveStatusDot.setMinSize(18, 18);
+        ownIdActiveStatusDot.setMaxSize(18, 18);
+        ownIdActiveStatusDot.setStyle(
+                "-fx-border-width: 1.5;" +
+                        "-fx-background-radius: 999;" +
+                        "-fx-border-radius: 999;"
+        );
+    }
+
+    private void setConversationListLoading(boolean loading) {
+        setNodeVisible(conversationLoadingOverlay, loading);
+    }
+
+    private void setMessageLoading(boolean loading) {
+        setNodeVisible(messageLoadingOverlay, loading);
+    }
+
+    private boolean isViewingOwnProfile() {
+        return viewedProfileUser != null
+                && currentUser != null
+                && safeEquals(viewedProfileUser.getUsername(), currentUser.getUsername());
+    }
+
+    private void updateOwnIdNavigationForProfile(boolean ownProfile) {
+        setSectionVisible(editDetailsButton, ownProfile);
+        setSectionVisible(changePasswordButton, ownProfile);
+        setNodeVisible(recipientInfoCloseButton, !ownProfile);
+        if (recipientInfoCloseButton != null && !ownProfile) {
+            recipientInfoCloseButton.toFront();
+        }
+        if (!ownProfile) {
+            updateOwnIdNavButton(editDetailsButton, false);
+            updateOwnIdNavButton(changePasswordButton, false);
+        }
+        refreshActiveStatusIndicators();
+    }
+
+    private boolean isRecipientProfileVisible() {
+        return ownIdPage != null && ownIdPage.isVisible() && !isViewingOwnProfile();
     }
 
     private void populateEditDetailsForm() {
@@ -1332,7 +1547,10 @@ public class ChatPageController {
         });
     }
 
-    private void showOwnIdPage(boolean visible) {
+    private void showProfilePane(boolean visible, boolean showOwnIdSidebar) {
+        if (!visible) {
+            viewedProfileUser = null;
+        }
         if (chatContent != null) {
             chatContent.setVisible(!visible);
             chatContent.setManaged(!visible);
@@ -1342,24 +1560,24 @@ public class ChatPageController {
             ownIdPage.setManaged(visible);
         }
         if (sidebarTitleLabel != null) {
-            sidebarTitleLabel.setVisible(!visible);
-            sidebarTitleLabel.setManaged(!visible);
+            sidebarTitleLabel.setVisible(!visible || !showOwnIdSidebar);
+            sidebarTitleLabel.setManaged(!visible || !showOwnIdSidebar);
         }
         if (conversationList != null) {
-            conversationList.setVisible(!visible);
-            conversationList.setManaged(!visible);
+            conversationList.setVisible(!visible || !showOwnIdSidebar);
+            conversationList.setManaged(!visible || !showOwnIdSidebar);
         }
         if (ownIdSidebarSections != null) {
-            ownIdSidebarSections.setVisible(visible);
-            ownIdSidebarSections.setManaged(visible);
+            ownIdSidebarSections.setVisible(visible && showOwnIdSidebar);
+            ownIdSidebarSections.setManaged(visible && showOwnIdSidebar);
         }
         if (addFriendButton != null) {
-            addFriendButton.setVisible(!visible);
-            addFriendButton.setManaged(!visible);
+            addFriendButton.setVisible(!visible || !showOwnIdSidebar);
+            addFriendButton.setManaged(!visible || !showOwnIdSidebar);
         }
         if (createGroupButton != null) {
-            createGroupButton.setVisible(!visible);
-            createGroupButton.setManaged(!visible);
+            createGroupButton.setVisible(!visible || !showOwnIdSidebar);
+            createGroupButton.setManaged(!visible || !showOwnIdSidebar);
         }
         if (sidebarContent != null) {
             sidebarContent.requestLayout();
@@ -1370,6 +1588,8 @@ public class ChatPageController {
         }
         if (visible) {
             setDrawerVisible(false);
+        } else {
+            updateOwnIdNavigationForProfile(false);
         }
     }
 
@@ -1431,6 +1651,13 @@ public class ChatPageController {
 
     private String safeValue(String value) {
         return value == null || value.isBlank() ? "Unavailable" : value;
+    }
+
+    private boolean safeEquals(String left, String right) {
+        if (left == null) {
+            return right == null;
+        }
+        return left.equals(right);
     }
 
     private String blankIfNull(String value) {

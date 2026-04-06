@@ -44,6 +44,7 @@ public class EventHandler {
                 case "UNSEND_MESSAGE" -> handleUnsendMessage(username, event);
                 case "GET_MESSAGES" -> handleGetMessages(username, event.getConversationId());
                 case "GET_CONVERSATIONS" -> handleGetConversations(username);
+                case "GET_USERS" -> handleGetUsers(username);
                 case "CREATE_CONVERSATION" ->
                         handleCreateConversation(username, (String) event.getData("name"), (List<String>) event.getData("members"));
                 case "CALL_REQUEST", "CALL_ACCEPTED", "CALL_REJECTED", "CALL_ENDED", "CALL_AUDIO", "CALL_VIDEO_FRAME" ->
@@ -120,6 +121,7 @@ public class EventHandler {
 
         broadcastMessage(message);
     }
+
     private void handleUnsendMessage(String username, Event event) throws IOException {
         String conversationId = event.getConversationId();
         String messageId = (String) event.getData("messageId");
@@ -132,7 +134,6 @@ public class EventHandler {
         if (target == null || target.getSender() == null) {
             return;
         }
-
         if (!username.equals(target.getSender().getUsername())) {
             return;
         }
@@ -148,7 +149,6 @@ public class EventHandler {
         broadcast(deletedEvent, conversationId);
         System.out.println("[MSG DELETED] [" + conversationId + "] " + username);
     }
-
 
     private void handleGetMessages(String username, String conversationId) throws IOException {
         List<Message> messages = messageRepo.getMessages(conversationId);
@@ -169,6 +169,35 @@ public class EventHandler {
 
         Event event = new Event("CONVERSATIONS_UPDATED");
         event.setData("conversations", conversations);
+
+        SocketWrapper client = connectedClients.get(username);
+        if (client != null) {
+            client.write(event);
+        }
+    }
+
+    private void handleGetUsers(String username) throws IOException {
+        List<String> suggestions = new ArrayList<>();
+        for (User user : userRepo.getAllUsers()) {
+            String candidate = user.getUsername();
+            if (candidate == null || candidate.isBlank() || candidate.equals(username)) {
+                continue;
+            }
+            suggestions.add(candidate);
+        }
+        suggestions.sort(String::compareToIgnoreCase);
+
+        List<String> onlineUsers = new ArrayList<>();
+        for (String connectedUser : connectedClients.keySet()) {
+            if (!connectedUser.equals(username)) {
+                onlineUsers.add(connectedUser);
+            }
+        }
+        onlineUsers.sort(String::compareToIgnoreCase);
+
+        Event event = new Event("USERS_UPDATED");
+        event.setData("suggestions", suggestions);
+        event.setData("onlineUsers", onlineUsers);
 
         SocketWrapper client = connectedClients.get(username);
         if (client != null) {
@@ -221,7 +250,7 @@ public class EventHandler {
         broadcastEvent.setConversationId(conversationId);
         broadcastEvent.setUsername(message.getSender().getUsername());
         broadcastEvent.setText(message.getText());
-        broadcastEvent.setData("messageId", message.getId());
+        broadcastEvent.setData("messageId", message.getId()); // add this
         broadcastEvent.setData("messageType", message.getMessageType());
         broadcastEvent.setData("fileName", message.getFileName());
         broadcastEvent.setData("fileData", message.getFileData());

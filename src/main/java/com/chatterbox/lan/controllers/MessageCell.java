@@ -35,7 +35,7 @@ public class MessageCell extends ListCell<Message> {
         boolean isMine = message.getSender() != null && message.getSender().isMe();
 
         HBox root = new HBox(8);
-        root.setMaxWidth(Double.MAX_VALUE);
+        root.setMaxWidth(Region.USE_PREF_SIZE);
 
         VBox messageBox = new VBox(4);
         messageBox.getStyleClass().add("message-box");
@@ -47,18 +47,24 @@ public class MessageCell extends ListCell<Message> {
         }
 
         if (message.isDeleted()) {
-            String deletedText = (message.getText() == null || message.getText().isBlank())
-                    ? "Message unsent"
-                    : message.getText();
-            Label deleted = new Label(deletedText);            deleted.getStyleClass().add("message-deleted-text");
+            String deletedText = "Message Unsent";
+            Label deleted = new Label(deletedText);
+            deleted.getStyleClass().add("message-deleted-text");
             messageBox.getChildren().add(deleted);
             messageBox.getStyleClass().add("message-deleted-box");
         } else if (message.isFileMessage()) {
-            Button save = new Button("Save: " + (message.getFileName() == null ? "File" : message.getFileName()));
-            save.getStyleClass().add("message-file-button");
-            save.setOnAction(e -> saveFile(message));
-            messageBox.getChildren().add(save);
-            messageBox.getStyleClass().add(isMine ? "message-me" : "message-other");
+            Label fileLabel = new Label(message.getFileName() == null ? "File" : message.getFileName());
+            fileLabel.getStyleClass().add("message-file-name");
+            HBox.setHgrow(fileLabel, Priority.ALWAYS);
+            fileLabel.setMaxWidth(Double.MAX_VALUE);
+
+            Button downloadButton = new Button("Save File");
+            downloadButton.getStyleClass().add("message-file-button");
+            downloadButton.setOnAction(event -> saveFile(message));
+
+            HBox fileRow = new HBox(8, fileLabel, downloadButton);
+            fileRow.setAlignment(Pos.CENTER_LEFT);
+            messageBox.getChildren().add(fileRow);
         } else {
             Text text = new Text(message.getText() == null ? "" : message.getText());
             text.setWrappingWidth(300);
@@ -67,13 +73,12 @@ public class MessageCell extends ListCell<Message> {
             messageBox.getStyleClass().add(isMine ? "message-me" : "message-other");
         }
 
+        //unsend
         Button actions = new Button("⋯");
         actions.getStyleClass().add("message-options-btn");
         actions.setFocusTraversable(false);
 
-        // FIX 1: Set opacity to 0 by default instead of setVisible(false)
         actions.setOpacity(0);
-        // Keep it managed so the layout space is always reserved
         actions.setManaged(isMine && !message.isDeleted());
 
         ContextMenu menu = new ContextMenu();
@@ -95,20 +100,24 @@ public class MessageCell extends ListCell<Message> {
             }
         });
 
-        // FIX 2: Add hover listeners to the root HBox
         root.setOnMouseEntered(e -> { if(isMine && !message.isDeleted()) actions.setOpacity(1); });
         root.setOnMouseExited(e -> actions.setOpacity(0));
 
+        //end
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
+        root.getChildren().clear();
         if (isMine) {
-            root.setAlignment(Pos.CENTER_RIGHT);
-            // FIX 3: Put actions BEFORE messageBox to have it appear on the left
+            messageBox.getStyleClass().add("message-me");
             root.getChildren().addAll(spacer, actions, messageBox);
+            root.setAlignment(Pos.CENTER_RIGHT);
+            setAlignment(Pos.CENTER_RIGHT);
         } else {
-            root.setAlignment(Pos.CENTER_LEFT);
+            messageBox.getStyleClass().add("message-other");
             root.getChildren().addAll(messageBox, spacer);
+            root.setAlignment(Pos.CENTER_LEFT);
+            setAlignment(Pos.CENTER_RIGHT);
         }
 
         setGraphic(root);
@@ -117,16 +126,23 @@ public class MessageCell extends ListCell<Message> {
 
 
     private void saveFile(Message message) {
-        if (message.getFileData() == null || getScene() == null) return;
+        if (message.getFileData() == null || message.getFileData().length == 0 || getScene() == null) {
+            return;
+        }
+
         FileChooser chooser = new FileChooser();
-        chooser.setInitialFileName(message.getFileName() == null ? "file" : message.getFileName());
+        chooser.setTitle("Save File");
+        chooser.setInitialFileName(message.getFileName() == null ? "attachment" : message.getFileName());
         File file = chooser.showSaveDialog(getScene().getWindow());
-        if (file != null) {
-            try {
-                Files.write(file.toPath(), message.getFileData());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (file == null) {
+            return;
+        }
+
+        try {
+            Files.write(file.toPath(), message.getFileData());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save file", e);
         }
     }
+
 }
